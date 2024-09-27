@@ -24,7 +24,7 @@ ifeq ($(GOLANGCI_LINT),)
 endif
 
 lint: install-golangci-lint ## run lint
-	$(GOLANGCI_LINT) run -v
+	$(GOLANGCI_LINT) run -v --concurrency=2 --max-issues-per-linter=50 --max-same-issues=5
 
 build: ## compile the app
 	CGO_ENABLED=0 go build -ldflags "-X main.version=dev" -o $(APP_EXECUTABLE) main.go

@@ -62,35 +62,39 @@ func (s SFTPCollector) Describe(ch chan<- *prometheus.Desc) {
 func (s SFTPCollector) Collect(ch chan<- prometheus.Metric) {
 	paths := viper.GetStringSlice(viperkeys.SFTPPaths)
 
+	// Establish SFTP connection
 	if err := s.sftpClient.Connect(); err != nil {
 		ch <- prometheus.MustNewConstMetric(up, prometheus.GaugeValue, 0)
 		log.WithField("when", "collecting up metric").Error(err)
 		return
 	}
-	defer s.sftpClient.Close()
-	log.Debug("connected to SFTP")
+	defer func() {
+		if err := s.sftpClient.Close(); err != nil {
+			log.WithField("when", "closing SFTP client").Error(err)
+		}
+	}()
 	ch <- prometheus.MustNewConstMetric(up, prometheus.GaugeValue, 1)
 
 	log.Debug("collecting filesystem metrics")
 	for _, path := range paths {
-			log.Debugf("collecting filesystem metrics for path: %s", path)
+		log.Debugf("collecting filesystem metrics for path: %s", path)
 
-			// Check if StatVFS is supported
-			if !s.sftpClient.SupportsStatVFS() {
-					log.Warnf("StatVFS is not supported by the SFTP server for path: %s, skipping metric collection", path)
-					continue
-			}
+		// Check if StatVFS is supported
+		if !s.sftpClient.SupportsStatVFS() {
+			log.Warnf("StatVFS is not supported by the SFTP server for path: %s, skipping metric collection", path)
+			continue
+		}
 
-			statVFS, err := s.sftpClient.StatVFS(path)
-			if err != nil {
-					log.WithFields(log.Fields{"when": "collecting filesystem metrics", "path": path}).Error(err)
-			} else {
-					totalSpace := float64(statVFS.TotalSpace())
-					freeSpace := float64(statVFS.FreeSpace())
-					log.Debugf("writing filesystem metrics for path: %s", path)
-					ch <- prometheus.MustNewConstMetric(fsTotalSpace, prometheus.GaugeValue, totalSpace, path)
-					ch <- prometheus.MustNewConstMetric(fsFreeSpace, prometheus.GaugeValue, freeSpace, path)
-			}
+		statVFS, err := s.sftpClient.StatVFS(path)
+		if err != nil {
+			log.WithFields(log.Fields{"when": "collecting filesystem metrics", "path": path}).Error(err)
+		} else {
+			totalSpace := float64(statVFS.TotalSpace())
+			freeSpace := float64(statVFS.FreeSpace())
+			log.Debugf("writing filesystem metrics for path: %s", path)
+			ch <- prometheus.MustNewConstMetric(fsTotalSpace, prometheus.GaugeValue, totalSpace, path)
+			ch <- prometheus.MustNewConstMetric(fsFreeSpace, prometheus.GaugeValue, freeSpace, path)
+		}
 	}
 
 	log.Debug("collecting object metrics")
