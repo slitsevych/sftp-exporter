@@ -1,0 +1,8 @@
+version: "3"
+
+tasks:
+  build-sftp-exporter:
+    dir: "./"
+    cmds:
+      - docker buildx build -t slitsevych/sftp-exporter:latest . -f build.Dockerfile
+      - docker push slitsevych/sftp-exporter:latest

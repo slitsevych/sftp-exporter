@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/arunvelsriram/sftp-exporter/pkg/constants/viperkeys"
-	"github.com/arunvelsriram/sftp-exporter/pkg/internal/mocks"
+	"github.com/slitsevych/sftp-exporter/pkg/constants/viperkeys"
+	"github.com/slitsevych/sftp-exporter/pkg/internal/mocks"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/ssh"

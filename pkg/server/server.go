@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/arunvelsriram/sftp-exporter/pkg/constants/viperkeys"
+	"github.com/slitsevych/sftp-exporter/pkg/constants/viperkeys"
 	"github.com/spf13/viper"
 
-	"github.com/arunvelsriram/sftp-exporter/pkg/client"
-	"github.com/arunvelsriram/sftp-exporter/pkg/collector"
+	"github.com/slitsevych/sftp-exporter/pkg/client"
+	"github.com/slitsevych/sftp-exporter/pkg/collector"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"

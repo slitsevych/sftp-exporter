@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/arunvelsriram/sftp-exporter/pkg/constants/viperkeys"
-	"github.com/arunvelsriram/sftp-exporter/pkg/server"
+	"github.com/slitsevych/sftp-exporter/pkg/constants/viperkeys"
+	"github.com/slitsevych/sftp-exporter/pkg/server"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

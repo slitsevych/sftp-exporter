@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 
-	"github.com/arunvelsriram/sftp-exporter/pkg/constants/viperkeys"
+	"github.com/slitsevych/sftp-exporter/pkg/constants/viperkeys"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/ssh"

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/arunvelsriram/sftp-exporter/pkg/constants/viperkeys"
-	"github.com/arunvelsriram/sftp-exporter/pkg/internal/mocks"
+	"github.com/slitsevych/sftp-exporter/pkg/constants/viperkeys"
+	"github.com/slitsevych/sftp-exporter/pkg/internal/mocks"
 	"github.com/kr/fs"
 	"github.com/pkg/sftp"
 	"github.com/prometheus/client_golang/prometheus"
@@ -57,6 +57,9 @@ func (s *SFTPCollectorSuite) SetupTest() {
 	s.ctrl = gomock.NewController(s.T())
 	s.sftpClient = mocks.NewMockSFTPClient(s.ctrl)
 	s.collector = NewSFTPCollector(s.sftpClient)
+
+	// Mock the SupportsStatVFS method
+	s.sftpClient.EXPECT().SupportsStatVFS().Return(true).AnyTimes()  // or false based on test scenario
 }
 
 func (s *SFTPCollectorSuite) TearDownTest() {

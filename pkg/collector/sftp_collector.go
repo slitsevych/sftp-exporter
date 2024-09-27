@@ -1,12 +1,12 @@
 package collector
 
 import (
-	"github.com/arunvelsriram/sftp-exporter/pkg/constants/viperkeys"
+	"github.com/slitsevych/sftp-exporter/pkg/constants/viperkeys"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
-	"github.com/arunvelsriram/sftp-exporter/pkg/client"
-	c "github.com/arunvelsriram/sftp-exporter/pkg/constants"
+	"github.com/slitsevych/sftp-exporter/pkg/client"
+	c "github.com/slitsevych/sftp-exporter/pkg/constants"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -73,17 +73,24 @@ func (s SFTPCollector) Collect(ch chan<- prometheus.Metric) {
 
 	log.Debug("collecting filesystem metrics")
 	for _, path := range paths {
-		log.Debugf("collecting filesystem metrics for path: %s", path)
-		statVFS, err := s.sftpClient.StatVFS(path)
-		if err != nil {
-			log.WithFields(log.Fields{"when": "collecting filesystem metrics", "path": path}).Error(err)
-		} else {
-			totalSpace := float64(statVFS.TotalSpace())
-			freeSpace := float64(statVFS.FreeSpace())
-			log.Debugf("writing filesystem metrics for path: %s", path)
-			ch <- prometheus.MustNewConstMetric(fsTotalSpace, prometheus.GaugeValue, totalSpace, path)
-			ch <- prometheus.MustNewConstMetric(fsFreeSpace, prometheus.GaugeValue, freeSpace, path)
-		}
+			log.Debugf("collecting filesystem metrics for path: %s", path)
+
+			// Check if StatVFS is supported
+			if !s.sftpClient.SupportsStatVFS() {
+					log.Warnf("StatVFS is not supported by the SFTP server for path: %s, skipping metric collection", path)
+					continue
+			}
+
+			statVFS, err := s.sftpClient.StatVFS(path)
+			if err != nil {
+					log.WithFields(log.Fields{"when": "collecting filesystem metrics", "path": path}).Error(err)
+			} else {
+					totalSpace := float64(statVFS.TotalSpace())
+					freeSpace := float64(statVFS.FreeSpace())
+					log.Debugf("writing filesystem metrics for path: %s", path)
+					ch <- prometheus.MustNewConstMetric(fsTotalSpace, prometheus.GaugeValue, totalSpace, path)
+					ch <- prometheus.MustNewConstMetric(fsFreeSpace, prometheus.GaugeValue, freeSpace, path)
+			}
 	}
 
 	log.Debug("collecting object metrics")
